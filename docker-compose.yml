@@ -4,6 +4,6 @@ services:
     build:
       context: ./
     ports:
-      - "3300:3000"
+      - "3300:3300"
     environment:
       NODE_ENV: production
