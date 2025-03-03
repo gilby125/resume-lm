@@ -9,6 +9,7 @@ RUN npm install -g pnpm && pnpm install
 COPY . .
 
 RUN npm run build
+
 EXPOSE 3300
 
-CMD ["npm", "start"]
+CMD ["next", "start", "-p", "3300"]
