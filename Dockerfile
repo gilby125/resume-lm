@@ -12,11 +12,9 @@ RUN npm install next
 
 COPY . .
 
-RUN echo "Starting npm run build"
-
-RUN npm run build > build.log 2>&1
-
-RUN echo "Finished npm run build"
+RUN echo "Running next build"
+RUN node_modules/.bin/next build
+RUN echo "Next build completed"
 
 EXPOSE 3300
 
