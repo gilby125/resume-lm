@@ -12,7 +12,11 @@ RUN npm install next
 
 COPY . .
 
-RUN npm run build
+RUN echo "Starting npm run build"
+
+RUN npm run build > build.log 2>&1
+
+RUN echo "Finished npm run build"
 
 EXPOSE 3300
 
