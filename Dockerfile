@@ -12,4 +12,4 @@ RUN npm run build
 
 EXPOSE 3300
 
-CMD ["next", "start", "-p", "3300"]
+CMD ["node_modules/.bin/next", "start", "-p", "3300"]
