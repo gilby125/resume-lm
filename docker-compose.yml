@@ -6,4 +6,4 @@ services:
     ports:
       - "3300:3300"
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
