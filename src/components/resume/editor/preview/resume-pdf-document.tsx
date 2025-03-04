@@ -561,7 +561,6 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
             <Image 
               src="/images/ubc-science-footer.png"
               style={styles.footerImage}
-              alt=""
             />
           </View>
         )}
