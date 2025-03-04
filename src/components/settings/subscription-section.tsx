@@ -92,12 +92,14 @@ export function SubscriptionSection() {
   };
 
   const handleCheckout = async (plan: Plan) => {
-    if (!plan.priceId) return;
+    if (!plan.priceId) {
+      return;
+    }
 
     try {
       setIsCheckingOut(true);
       const { clientSecret } = await postStripeSession({ priceId: plan.priceId });
-      router.push(`/subscription/checkout?session_id=${clientSecret}`);
+      router.push(`/subscription/checkout?session_id=${clientSecret}&price_id=${plan.priceId}`);
     } catch (error) {
       console.error(`Error during checkout:`, error);
       setIsCheckingOut(false);
@@ -326,4 +328,4 @@ export function SubscriptionSection() {
       </div>
     </div>
   );
-} 
+}

@@ -42,6 +42,9 @@ export const postStripeSession = async ({ priceId }: NewSessionOptions) => {
             return_url: returnUrl,
         });
 
+        if (!priceId) {
+            throw new Error('Price ID cannot be empty');
+        }
         if (!session.client_secret) {
             throw new Error('Failed to create Stripe session');
         }

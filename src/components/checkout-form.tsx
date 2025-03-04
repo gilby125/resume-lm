@@ -34,6 +34,12 @@ export function CheckoutForm() {
     const priceId = searchParams.get('price_id')!
 
     const fetchClientSecret = useCallback(async () => {
+        if (!priceId) {
+            throw new Error('Price ID is missing');
+        }
+        if (priceId.trim() === "") {
+            throw new Error('Price ID cannot be empty');
+        }
         const stripeResponse = await postStripeSession({ priceId });
         return stripeResponse.clientSecret;
     }, [priceId]);
@@ -115,4 +121,3 @@ export function CheckoutForm() {
         </div>
     );
 }
-
