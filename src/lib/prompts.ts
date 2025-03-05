@@ -85,6 +85,7 @@ Output Requirements:
 - For array fields, use empty arrays ([]) when no data exists
 - For object fields, use empty objects ({}) when no data exists
 
+
 Remember: Your primary role is to ensure COMPLETE preservation of ALL content while enhancing presentation. You are a professional formatter who must retain every single detail from the original content.`
 };
 
@@ -172,6 +173,7 @@ PROHIBITED PATTERNS:
 - No vague descriptors (many, several, various)
 - No job duty listings without impact
 - No unexplained acronyms
+- None of the following words in any of their forms: Spearhead, tapestry, keen, shaping
 
 OPTIMIZATION RULES:
 1. Each bullet must demonstrate either:
