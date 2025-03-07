@@ -33,6 +33,7 @@ interface AuthContextType {
   validateField: (field: keyof FormData, value: string) => void;
   touchedFields: TouchedFields;
   setFieldTouched: (field: string) => void;
+  isPro: true;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -105,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         validation = validateName(value);
         break;
       case 'confirmPassword':
-        validation = value === formData.password 
+        validation = value === formData.password
           ? { isValid: true }
           : { isValid: false, message: 'Passwords do not match' };
         break;
@@ -157,17 +158,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTouchedFields({});
   };
 
+  const isPro = true;
+
   return (
-    <AuthContext.Provider value={{ 
-      formData, 
-      setFormData, 
-      isLoading, 
-      setFieldLoading, 
+    <AuthContext.Provider value={{
+      formData,
+      setFormData,
+      isLoading,
+      setFieldLoading,
       clearForm,
       validations,
       validateField,
       touchedFields,
-      setFieldTouched
+      setFieldTouched,
+      isPro
     }}>
       {children}
     </AuthContext.Provider>
@@ -180,4 +184,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

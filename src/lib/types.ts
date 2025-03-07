@@ -170,7 +170,7 @@ export const AI_PROVIDERS = {
   // COHERE: 'cohere',
   // FIREWORKS: 'fireworks',
   // DEEPINFRA: 'deepinfra',
-  // GROQ: 'groq'
+  GROQ: 'groq',
   DEEPSEEK: 'deepseek',
 } as const;
 
@@ -191,5 +191,3 @@ export type ServiceName =
   // | 'deepinfra'
   | 'groq'
   | 'deepseek';
-
-

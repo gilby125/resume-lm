@@ -29,6 +29,7 @@ const MODEL_ICONS = {
   anthropic: '/claude.webp',
   openai: '/chatgpt.png',
   // deepseek: '/deepseek.png',
+  groq: '/chatgpt.png' // Using OpenAI icon as placeholder
 } as const
 
 // Add ModelIcon component at the top of the file
@@ -81,6 +82,18 @@ const AI_MODELS: AIModel[] = [
   //   shortName: 'DeepSeek V3',
   //   provider: 'deepseek'
   // },
+  { 
+    id: 'gemma-7b', 
+    name: 'Groq Gemma 7b', 
+    shortName: 'Gemma 7b',
+    provider: 'groq'
+  },
+  { 
+    id: 'gemma-2b', 
+    name: 'Groq Gemma 2b', 
+    shortName: 'Gemma 2b',
+    provider: 'groq'
+  }
 ]
 
 export function ModelSelector() {
@@ -223,4 +236,4 @@ export function ModelSelector() {
       </Select>
     </div>
   )
-} 
+}
