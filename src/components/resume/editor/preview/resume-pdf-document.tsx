@@ -558,7 +558,7 @@ export const ResumePDFDocument = memo(function ResumePDFDocument({ resume }: Res
         
         {resume.document_settings?.show_ubc_footer && (
           <View style={styles.footer}>
-            <Image 
+            <Image
               src="/images/ubc-science-footer.png"
               style={styles.footerImage}
             />

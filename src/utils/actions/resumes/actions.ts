@@ -327,7 +327,7 @@ export async function copyResume(resumeId: string): Promise<Resume> {
     throw new Error('Resume not found or access denied');
   }
 
-  const { id, ...resumeDataToCopy } = sourceResume;
+  const { ...resumeDataToCopy } = sourceResume;
 
   const newResume = {
     ...resumeDataToCopy,
