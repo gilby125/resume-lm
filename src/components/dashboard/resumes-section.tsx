@@ -12,7 +12,9 @@ import type { Profile, Resume } from '@/lib/types';
 import { deleteResume, copyResume } from '@/utils/actions/resumes/actions';
 import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { t } from 'i18next';
 
 interface ResumesSectionProps {
   type: 'base' | 'tailored';
@@ -155,10 +157,10 @@ export function ResumesSection({
       <div className="flex flex-col gap-4 w-full">
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h2 className={`text-2xl sm:text-3xl font-semibold tracking-tight bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
-            {type === 'base' ? 'Base' : 'Tailored'} Resumes.replace(/"/g, """)
+            {type === 'base' ? 'Base' : 'Tailored'} Resumes
           </h2>
           <div className="flex items-center gap-2 mb-4">
-            <ResumeSortControls 
+            <ResumeSortControls
               sortParam={sortParam}
               directionParam={directionParam}
               currentSort={currentSort}
@@ -315,7 +317,7 @@ export function ResumesSection({
                             <AlertDialogHeader>
                               <AlertDialogTitle>Delete Resume</AlertDialogTitle>
                               <AlertDialogDescription>
-                      Are you sure you want to delete "{resume.name.replace(/"/g, """)}"? This action cannot be undone.
+                      {t("dashboard.resumes.delete.confirmation", { name: resume.name.replace(/"/g, '"') })} This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -409,7 +411,7 @@ export function ResumesSection({
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Resume</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete {`"${resume.name}"`}? This action cannot be undone.
+                      {t("dashboard.resumes.delete.confirmation", { name: resume.name })} This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
