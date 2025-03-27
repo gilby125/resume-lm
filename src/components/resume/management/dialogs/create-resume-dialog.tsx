@@ -1,24 +1,50 @@
 'use client';
 
-import { CreateBaseResumeDialog } from "./create-base-resume-dialog";
-import { CreateTailoredResumeDialog } from "./create-tailored-resume-dialog";
-import { Resume, Profile } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import type { Profile, Resume } from "@/lib/types";
 
 interface CreateResumeDialogProps {
   children: React.ReactNode;
   type: 'base' | 'tailored';
-  baseResumes?: Resume[];
   profile: Profile;
+  baseResumes?: Resume[];
 }
 
-export function CreateResumeDialog({ children, type, baseResumes, profile }: CreateResumeDialogProps) {
-  if (type === 'base') {
-    return <CreateBaseResumeDialog profile={profile}>{children}</CreateBaseResumeDialog>;
-  }
+export function CreateResumeDialog({ children, type, profile, baseResumes }: CreateResumeDialogProps) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <CreateTailoredResumeDialog baseResumes={baseResumes} profile={profile}>
-      {children}
-    </CreateTailoredResumeDialog>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent 
+        className="sm:max-w-[800px] p-6"
+        aria-describedby="resume-dialog-description"
+      >
+        <DialogHeader>
+          <DialogTitle>
+            Create {type === 'base' ? 'Base' : 'Tailored'} Resume
+          </DialogTitle>
+          <DialogDescription id="resume-dialog-description">
+            {type === 'base' 
+              ? 'Create a new base resume that you can use as a template for job applications'
+              : 'Create a tailored resume based on one of your base resumes'
+            }
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Your existing dialog content */}
+        
+      </DialogContent>
+    </Dialog>
   );
 } 

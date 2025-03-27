@@ -10,48 +10,34 @@ import { generateObject } from "ai";
 import { initializeAIClient } from "@/utils/ai-tools";
 import { resumeScoreSchema } from "@/lib/zod-schemas";
 import { getSubscriptionPlan } from "../stripe/actions";
+import { LanguageModelV1 } from "ai";
 
 
-//  SUPABASE ACTIONS
-export async function getResumeById(resumeId: string): Promise<{ resume: Resume; profile: Profile }> {
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
-  if (error || !user) {
-    throw new Error('User not authenticated');
-  }
-
+async function generateTailoredResumeContent(
+  aiClient: LanguageModelV1,
+  baseResume: Resume,
+  jobDescription: string
+): Promise<z.infer<typeof simplifiedResumeSchema>> {
   try {
-    const [resumeResult, profileResult] = await Promise.all([
-      supabase
-        .from('resumes')
-        .select('*')
-        .eq('id', resumeId)
-        .eq('user_id', user.id)
-        .single(),
-      supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
-    ]);
+    const { object } = await generateObject({
+      model: aiClient,
+      schema: simplifiedResumeSchema,
+      prompt: `
+        Given the following resume: ${JSON.stringify(baseResume)},
+        and the following job description: ${jobDescription},
+        generate a tailored resume that highlights the most relevant skills and experience for the job.
+        Ensure the tailored resume includes a target_role.
+      `,
+    });
 
-    if (resumeResult.error || !resumeResult.data) {
-      throw new Error('Resume not found');
-    }
-
-    if (profileResult.error || !profileResult.data) {
-      throw new Error('Profile not found');
-    }
-
-    return { 
-      resume: resumeResult.data, 
-      profile: profileResult.data 
-    };
+    return object;
   } catch (error) {
+    console.error("Error generating tailored resume content:", error);
     throw error;
   }
 }
+
+//  SUPABASE ACTIONS
 
 export async function updateResume(resumeId: string, data: Partial<Resume>): Promise<Resume> {
   const supabase = await createClient();
@@ -263,7 +249,7 @@ export async function createTailoredResume(
   jobId: string | null,
   jobTitle: string,
   companyName: string,
-  tailoredContent: z.infer<typeof simplifiedResumeSchema>
+  jobDescription: string
 ) {
   console.log('[createTailoredResume] Received jobId:', jobId);
   console.log('[createTailoredResume] baseResume ID:', baseResume?.id);
@@ -276,36 +262,47 @@ export async function createTailoredResume(
     throw new Error('User not authenticated');
   }
 
-  const newResume = {
-    ...tailoredContent,
-    user_id: user.id,
-    job_id: jobId,
-    is_base_resume: false,
-    first_name: baseResume.first_name,
-    last_name: baseResume.last_name,
-    email: baseResume.email,
-    phone_number: baseResume.phone_number,
-    location: baseResume.location,
-    website: baseResume.website,
-    linkedin_url: baseResume.linkedin_url,
-    github_url: baseResume.github_url,
-    document_settings: baseResume.document_settings,
-    section_configs: baseResume.section_configs,
-    section_order: baseResume.section_order,
-    resume_title: `${jobTitle} at ${companyName}`,
-    name: `${jobTitle} at ${companyName}`,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
+  const subscriptionPlan = await getSubscriptionPlan();
+  const isPro = subscriptionPlan === 'pro';
+  const aiClient = isPro ? initializeAIClient({model: "gemini-1.5-pro-latest", apiKeys: [{ service: "google", key: process.env.GEMINI_API_KEY || "", addedAt: new Date().toISOString() }]}, isPro) : initializeAIClient({model: "gemini-1.5-pro-latest", apiKeys: [{ service: "google", key: process.env.GEMINI_API_KEY || "", addedAt: new Date().toISOString() }]});
 
-  const { data, error } = await supabase
-    .from('resumes')
-    .insert([newResume])
-    .select()
-    .single();
+  try {
+    const tailoredContent = await generateTailoredResumeContent(aiClient as LanguageModelV1, baseResume, jobDescription);
+    
+    const newResume: any = {
+      ...tailoredContent,
+      user_id: user.id,
+      job_id: jobId,
+      is_base_resume: false,
+      first_name: baseResume.first_name,
+      last_name: baseResume.last_name,
+      email: baseResume.email,
+      phone_number: baseResume.phone_number,
+      location: baseResume.location,
+      website: baseResume.website,
+      linkedin_url: baseResume.linkedin_url,
+      github_url: baseResume.github_url,
+      document_settings: baseResume.document_settings,
+      section_configs: baseResume.section_configs,
+      section_order: baseResume.section_order,
+      resume_title: `${jobTitle} at ${companyName}`,
+      name: `${jobTitle} at ${companyName}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-  if (error) throw error;
-  return data;
+    const { data, error } = await supabase
+      .from('resumes')
+      .insert([newResume])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error creating tailored resume:", error);
+    throw error;
+  }
 }
 
 export async function copyResume(resumeId: string): Promise<Resume> {
@@ -385,46 +382,43 @@ export async function countResumes(type: 'base' | 'tailored' | 'all'): Promise<n
 }
 
 
-export async function generateResumeScore(
-  resume: Resume, 
-  config?: AIConfig
-) {
-  
 
+export async function getResumeById(resumeId: string): Promise<{ resume: Resume; profile: Profile }> {
+  const supabase = await createClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-  const subscriptionPlan = await getSubscriptionPlan();
-  const isPro = subscriptionPlan === 'pro';
-  const aiClient = isPro ? initializeAIClient(config, isPro) : initializeAIClient(config);
-
-
-  console.log("RESUME IS", resume);
-  // console.log("AICLIENT IS", aiClient);
+  if (error || !user) {
+    throw new Error('User not authenticated');
+  }
 
   try {
-    const { object } = await generateObject({
-      model: aiClient,
-      schema: resumeScoreSchema,
-      prompt: `
-      Generate a score for this resume: ${JSON.stringify(resume)}
-      MUST include a 'miscellaneous' field with 2-3 metrics following this format:
-      {
-        "metricName": {
-          "score": number,
-          "reason": "string explanation"
-        }
-      }
-      Example: 
-      "keywordOptimization": {
-        "score": 85,
-        "reason": "Good use of industry keywords but could add more variation"
-      }
-      `
-    });
+    const [resumeResult, profileResult] = await Promise.all([
+      supabase
+        .from('resumes')
+        .select('*')
+        .eq('id', resumeId)
+        .eq('user_id', user.id)
+        .single(),
+      supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+    ]);
 
-    // console.log("THE OUTPUTTED object", object);
-    return object
+    if (resumeResult.error || !resumeResult.data) {
+      throw new Error('Resume not found');
+    }
+
+    if (profileResult.error || !profileResult.data) {
+      throw new Error('Profile not found');
+    }
+
+    return { 
+      resume: resumeResult.data, 
+      profile: profileResult.data 
+    };
   } catch (error) {
-    console.error('Error SCORING resume:', error);
     throw error;
   }
 }

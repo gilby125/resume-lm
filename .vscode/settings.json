@@ -1,3 +1,25 @@
 {
-    "cline.chromeExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "cline.chromeExecutablePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ]
 }

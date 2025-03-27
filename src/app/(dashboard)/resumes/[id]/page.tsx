@@ -3,6 +3,7 @@ import { getResumeById } from "@/utils/actions/resumes/actions";
 import { ResumeEditorClient } from "@/components/resume/editor/resume-editor-client";
 import { Metadata } from "next";
 import { Resume } from "@/lib/types";
+import { PageIdentifier } from "@/components/debug/page-identifier";
 
 // Helper function to normalize resume data
 function normalizeResumeData(resume: Resume): Resume {
@@ -72,13 +73,20 @@ export async function generateMetadata({
   }
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-
-  
+export default function ResumeEditorPage({ params }: { params: { id: string } }) {
+  return (
+    <>
+      <PageIdentifier pageName={`ResumeEditorPage-${params.id}`} />
+      <div 
+        className="h-full flex flex-col "
+        data-page-title={normalizedResume.name}
+        data-resume-type={normalizedResume.is_base_resume ? "Base Resume" : "Tailored Resume"}
+      >
+        <ResumeEditorClient initialResume={normalizedResume} profile={profile} />
+      </div>
+    </>
+  );
+}
   try {
     const { id } = await params;
     const { resume: rawResume, profile } = await getResumeById(id);

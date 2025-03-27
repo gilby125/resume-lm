@@ -26,6 +26,7 @@ import { ResumesSection } from "@/components/dashboard/resumes-section";
 import { createClient } from "@/utils/supabase/server";
 import { getDashboardData } from "@/utils/actions";
 import { checkSubscriptionPlan } from "@/utils/actions/stripe/actions";
+import { CreateResumeDialog } from "@/components/resume/management/dialogs/create-resume-dialog";
 
 
 
